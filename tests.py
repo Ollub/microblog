@@ -4,7 +4,7 @@ from app import app, db
 from app.models import User, Post
 
 class UserModelCase(unittest.TestCase):
-    def seyUp(self):
+    def setUp(self):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         db.create_all()
 
@@ -19,7 +19,7 @@ class UserModelCase(unittest.TestCase):
         self.assertTrue(u.check_password('cat'))
 
     def test_avatar(self):
-        u = User(username='john', email='john@qxample.com')
+        u = User(username='john', email='john@example.com')
         self.assertEqual(u.avatar(128), ('https://www.gravatar.com/avatar/'
                                          'd4c74594d841139328695756648b6bd6'
                                          '?d=identicon&s=128'))
@@ -29,17 +29,17 @@ class UserModelCase(unittest.TestCase):
         u2 = User(username='susan', email='susan@example.com')
         db.session.add(u1)
         db.session.add(u2)
-        sb.session.commit()
+        db.session.commit()
         self.assertEqual(u1.followed.all(), [])
-        self.assertEqual(u1.followed.all(), [])
+        self.assertEqual(u2.followers.all(), [])
 
         u1.follow(u2)
         db.session.commit()
         self.assertTrue(u1.is_following(u2))
         self.assertEqual(u1.followed.count(), 1)
-        self.assertEqual(u2.folowers.count(), 1)
-        self.assertEqual(u1.followed.first().username, 'Susan')
-        self.assertEqual(u2.followers.first().username, 'John')
+        self.assertEqual(u2.followers.count(), 1)
+        self.assertEqual(u1.followed.first().username, 'susan')
+        self.assertEqual(u2.followers.first().username, 'john')
 
         u1.unfollow(u2)
         db.session.commit()
@@ -85,8 +85,8 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(f3, [p3, p4])
         self.assertEqual(f4, [p4])
 
-    if __name__ == '__main__':
-        unittest.main(verbosity=2)
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
 
 
 
